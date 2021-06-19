@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  clojure:
+    build: .
+    environment:
+      LEIN_REPL_PORT: 46123
+      LEIN_REPL_HOST: 0.0.0.0
+    ports:
+      - '46123:46123'
+    volumes:
+      - .:/usr/src/app
