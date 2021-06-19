@@ -1,14 +1,14 @@
 # how to setup
-'''
+```
 docker-compose up --build -d
 lein repl :connect localhost:46123
-'''
+```
 
-test (exercise)
-'''
+test (including exercise)
+```
 docker-compose exec clojure bash
 lein test
-'''
+```
 
 ## Domain-Specific Language
 
