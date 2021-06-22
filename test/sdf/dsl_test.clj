@@ -69,3 +69,13 @@
                                           (fn [a b c d e] (list a b c d e)))]
              (= (get-arity compose-f) 4)
              (= (get-arity para-f) 5))))
+
+ (deftest exercise-2-2-test
+   (testing "- hはarityに2を含むこと
+             - fとgの返り値をそれぞれ受け取る
+             - fはarityが一意であること
+             - 生成する関数のairtyはgのarity-listのそれぞれにfのarityを加えたもの
+             - 可変長引数のarityは##Inf
+             実装は諦めた"
+            (is true))) 
+
