@@ -79,3 +79,55 @@
              実装は諦めた"
             (is true))) 
 
+(deftest spread-apply-test
+  (testing "Valid case"
+           (let [sa (spread-apply (fn [x y] [(+ x y) (- x y)])
+                                  (fn [x y] [(* x y) (/ x y) x y]))]
+             (is (= (sa 1 2 3 4)
+                    '(3 -1 12 3/4 3 4))))))
+
+(deftest multi-compose-test
+  (testing "Valid case"
+           (let [mc (multi-compose (fn [x y z] [(+ x y z)])
+                                   (fn [x y] [(+ x y) x y]))]
+             (is (= (mc 1 2)
+                    '(6))))))
+
+(deftest composed-spread-combine-test
+  (testing "Valid case"
+           (let [f (composed-spread-combine 
+                                   (fn [x y] [(list x y)])
+                                   (fn [x y z] [(list x y z)] )
+                                   (fn [v w] [(list v w)]))]
+             (is
+               (= (f 'a 'b 'c 'd 'e)
+                 '(((a b c) (d e))) ))
+             (is
+               (= (get-arity f)
+                  5)))
+           (let [g (composed-spread-combine
+                     (fn [x y z a b c] [(+ x y) (+ z a) (+ b c)])
+                     (fn [x] [(* x 2) (- (* x 3) 1)])
+                     (fn [x y] [(* x y) (+ x y) x y]))]
+             (is
+               (= (g 1 2 3) '[4 11 5])))))
+
+(deftest exercise-2-3-test
+  (testing "composed-parallel-combine Valid Case"
+           (let [f (composed-parallel-combine 
+                                   (fn [x y z] [(list x y z)])
+                                   (fn [x y z] [(list x y z)] )
+                                   (fn [x y z] [(list x ) (list y z)]))]
+             (is
+               (= (f 'a 'b 'c)
+                 '(((a b c) (a) (b c))) ))
+             (is
+               (= (get-arity f)
+                  3)))
+           (let [g (composed-parallel-combine
+                     (fn [x y z a b c] [(+ x y) (+ z a) (+ b c)])
+                     (fn [x y] [(* x 2) (- (* y 3) 1)])
+                     (fn [x y] [(* x y) (+ x y) x y]))]
+             (is
+               (= (g 1 2) '[7 5 3]))
+             (is (= (get-arity g) 2)))))
