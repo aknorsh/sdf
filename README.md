@@ -9,6 +9,8 @@ test (including exercise)
 docker-compose exec clojure bash
 lein test
 ```
+ただし、最低限の動作確認とExerciseの要件を満たしているかチェックくらいしかしてないので注意
+（境界値での動作とかあまり考えてない）
 
 ## Domain-Specific Language
 

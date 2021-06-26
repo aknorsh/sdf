@@ -131,3 +131,33 @@
              (is
                (= (g 1 2) '[7 5 3]))
              (is (= (get-arity g) 2)))))
+
+(deftest remove-nth-test
+  (testing "ValidCase"
+           (= (remove-nth 0 [1 2 3 4 5])
+              [2 3 4 5])
+           (= (remove-nth 1 [1 2 3 4 5])
+              [1 3 4 5])
+           (= (remove-nth 2 [1 2 3 4 5])
+              [1 2 4 5])
+           (= (remove-nth 3 [1 2 3 4 5])
+              [1 2 3 5])
+           (= (remove-nth 4 [1 2 3 4 5])
+              [1 2 3 4])
+           (= (remove-nth 5 [1 2 3 4 5])
+              [1 2 3 4 5])))
+
+(deftest discard-argument-test
+  (testing "Valid case"
+           (= (((discard-argument 2) (fn [x y z] (list 'foo x y z)))
+               'a 'b 'c 'd)
+              '(foo a b d))))
+
+(deftest curry-argument-test
+  (testing "Valid case"
+           (= (((curry-argument 1 0 1 2) (fn [x y z w] [x y z w]))
+              1)
+              [0 1 1 2])
+           (= (((curry-argument 2 'a 'b 'c) (fn [x y z w] (list 'foo x y z w)))
+               'd)
+              '(foo a b d c))))

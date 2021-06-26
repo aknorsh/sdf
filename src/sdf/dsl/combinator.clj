@@ -135,3 +135,42 @@
   [h f g]
   (multi-compose h (parallel-apply f g)))
 
+
+(defn remove-nth
+  [i ls]
+  (concat (take i ls) (take-last (- (count ls) i 1) ls)))
+
+(defn discard-argument
+  "次の関数を返す：
+   - 関数fを受け取り、fのarity+1引数をとる関数を返す。
+   - ith引数を無視する"
+  [i]
+  (fn [f]
+      (let [f-arity (get-arity f)
+            ret-arity (inc f-arity)
+            check-f-arity-in-range-i (assert (< i ret-arity)
+                                             (str "Invalid arity: arity of f should be larger than " i))
+            the-composition (fn [& args]
+                                (assert (= (count args) ret-arity)
+                                        (str "Invalid number of args: " (count args) ", expect: " ret-arity))
+                                (apply f (remove-nth i args)))]
+        (restrict-arity the-composition ret-arity))))
+
+
+(defn insert-nth
+  [i el ls]
+  (concat (take i ls) (list el) (take-last (- (count ls) i) ls)))
+
+;; currying: 一部引数に所与の値を与えて、残りの引数をとる関数を生成するテクニック
+(defn curry-argument
+  "次の関数を返す：
+   - 関数fを受け取り、fの引数のith以外をargsで埋めた１引数関数を返す。"
+  [i & args]
+  (fn [f]
+      (let [f-arity (get-arity f)
+            check-f-arity-fits-args-cnt (assert (= f-arity (inc (count args)))
+                                                (str "Invalid arity: arity of f shuold be " (inc (count args))))
+            the-composition (fn [arg]
+                                (apply f (insert-nth i arg args)))]
+        (restrict-arity the-composition 1))))
+
