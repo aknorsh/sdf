@@ -1,6 +1,6 @@
-(ns sdf.dsl-test
+(ns sdf.dsl.combinator_test
     (:require [clojure.test :refer :all]
-     [sdf.dsl :refer :all]))
+     [sdf.dsl.combinator :refer :all]))
 
 (deftest dsl-test
   (testing "DSL TEST"

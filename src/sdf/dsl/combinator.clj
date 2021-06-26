@@ -1,4 +1,4 @@
-(ns sdf.dsl)
+(ns sdf.dsl.combinator)
 
 (defn get-arity
   "関数のarityを取得(無名関数もOK)"
