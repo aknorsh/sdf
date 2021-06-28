@@ -174,3 +174,24 @@
                                 (apply f (insert-nth i arg args)))]
         (restrict-arity the-composition 1))))
 
+(defn make-permutation
+  "permspecに応じて並び替えたlistを返す関数を返す"
+  [permspec]
+  (fn [ls]
+   (map (fn [ith] (nth ls ith)) permspec)))
+
+(defn permute-arguments
+  "次の関数を返す：
+   - 関数fを受け取り、fに対してpermspecに応じて並び替えた引数を渡す関数を返す。"
+  [& permspec]
+  (fn [f]
+      (let [f-arity (get-arity f)
+            check-f-arity-equals-to-permspec-len (assert (= f-arity (count permspec))
+                                                         (str "Invalid arity: arity of f should be " (count permspec)))
+            permute (make-permutation permspec)
+            the-composition (fn [& args]
+                                (assert (= f-arity (count args))
+                                        (str "Invalid number of args: " (count args) ", expect " f-arity))
+                                (apply f (permute args)))]
+        (restrict-arity the-composition f-arity))))
+

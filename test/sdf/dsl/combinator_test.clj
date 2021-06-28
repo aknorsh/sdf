@@ -161,3 +161,9 @@
            (= (((curry-argument 2 'a 'b 'c) (fn [x y z w] (list 'foo x y z w)))
                'd)
               '(foo a b d c))))
+
+(deftest permute-arguments-test
+  (testing "Valid case"
+           (= (((permute-arguments 1 2 0 3) (fn [x y z w] (list 'foo x y z w)))
+               'a 'b 'c 'd)
+              '(foo b c a d))))
