@@ -134,36 +134,89 @@
 
 (deftest remove-nth-test
   (testing "ValidCase"
-           (= (remove-nth 0 [1 2 3 4 5])
-              [2 3 4 5])
-           (= (remove-nth 1 [1 2 3 4 5])
-              [1 3 4 5])
-           (= (remove-nth 2 [1 2 3 4 5])
-              [1 2 4 5])
-           (= (remove-nth 3 [1 2 3 4 5])
-              [1 2 3 5])
-           (= (remove-nth 4 [1 2 3 4 5])
-              [1 2 3 4])
-           (= (remove-nth 5 [1 2 3 4 5])
-              [1 2 3 4 5])))
+           (is (= (remove-nth 0 [1 2 3 4 5])
+              [2 3 4 5]))
+           (is (= (remove-nth 1 [1 2 3 4 5])
+              [1 3 4 5]))
+           (is (= (remove-nth 2 [1 2 3 4 5])
+              [1 2 4 5]))
+           (is (= (remove-nth 3 [1 2 3 4 5])
+              [1 2 3 5]))
+           (is (= (remove-nth 4 [1 2 3 4 5])
+              [1 2 3 4]))
+           (is (= (remove-nth 5 [1 2 3 4 5])
+              [1 2 3 4 5]))))
 
 (deftest discard-argument-test
   (testing "Valid case"
-           (= (((discard-argument 2) (fn [x y z] (list 'foo x y z)))
+           (is (= (((discard-argument 2) (fn [x y z] (list 'foo x y z)))
                'a 'b 'c 'd)
-              '(foo a b d))))
+              '(foo a b d)))))
 
 (deftest curry-argument-test
   (testing "Valid case"
-           (= (((curry-argument 1 0 1 2) (fn [x y z w] [x y z w]))
+           (is (= (((curry-argument 1 0 1 2) (fn [x y z w] [x y z w]))
               1)
-              [0 1 1 2])
-           (= (((curry-argument 2 'a 'b 'c) (fn [x y z w] (list 'foo x y z w)))
+              [0 1 1 2]))
+           (is (= (((curry-argument 2 'a 'b 'c) (fn [x y z w] (list 'foo x y z w)))
                'd)
-              '(foo a b d c))))
+              '(foo a b d c)))))
 
 (deftest permute-arguments-test
   (testing "Valid case"
-           (= (((permute-arguments 1 2 0 3) (fn [x y z w] (list 'foo x y z w)))
+           (is (= (((permute-arguments 1 2 0 3) (fn [x y z w] (list 'foo x y z w)))
                'a 'b 'c 'd)
-              '(foo b c a d))))
+              '(foo b c a d)))))
+
+(deftest exercise-2-4
+  (testing "multi-discard-argument Valid case"
+           (is (= (((multi-discard-argument 2) (fn [x y z] ['foo x y z]))
+               'a 'b 'c 'd)
+              ['foo 'a 'b 'd])))
+  (testing "multi-discard-argument Valid case"
+           (is (= (((multi-curry-argument 1 0 1 2) (fn [x y z w] [x y z w]))
+               1)
+              [0 1 1 2]))
+           (is (= (((multi-curry-argument 2 'a 'b 'c) (fn [x y z w] ['foo x y z w]))
+               'd)
+              ['foo 'a 'b 'd 'c])))
+  (testing "multi-permute-arguments Valid case"
+           (is (= (((multi-permute-arguments 1 2 0 3) (fn [x y z w] ['foo x y z w]))
+               'a 'b 'c 'd)
+              ['foo 'b 'c 'a 'd]))))
+
+(deftest remove-nths-test
+  (testing "Valid"
+           (is 
+             (= (remove-nths [1 2] [1 2 3 4 5])
+                [1 4 5]))))
+
+(deftest insert-nths-test
+  (testing "Valid"
+           (is
+             (= (insert-nths [1 3 5] ['a 'b 'c] [1 2 3 4 5])
+                [1 'a 2 'b 3 'c 4 5]))))
+
+(deftest exercise-2-5-a-test
+  (testing "discard-arguments"
+           (is
+            (= (((discard-argument 2) (fn [x y z] ['foo x y z]))
+               'a 'b 'c 'd)
+               (((discard-arguments 2) (fn [x y z] ['foo x y z]))
+               'a 'b 'c 'd)))
+           (is
+             (= '(foo a d)
+               (((discard-arguments 1 2) (fn [x y] ['foo x y]))
+               'a 'b 'c 'd))))
+  (testing "curry-arguments"
+           (is
+             (= (((curry-argument 1 0 1 2) (fn [x y z w] [x y z w]))
+              1)
+                (((curry-arguments [1] 0 1 2) (fn [x y z w] [x y z w]))
+              1)))
+           (is
+             (= (((curry-argument 2 'a 'b 'c) (fn [x y z w] (list 'foo x y z w)))
+               'd)
+                  (((curry-arguments [2] 'a 'b 'c) (fn [x y z w] (list 'foo x y z w)))
+               'd)))))
+

@@ -195,3 +195,94 @@
                                 (apply f (permute args)))]
         (restrict-arity the-composition f-arity))))
 
+(defn multi-discard-argument
+  "次の関数を返す：
+   - 関数fを受け取り、fのarity+1引数をとる関数を返す。
+   - ith引数を無視する
+   - fの返り値は多値。vecに入れて表現する。"
+  [i]
+  (fn [f]
+      (let [f-arity (get-arity f)
+            ret-arity (inc f-arity)
+            check-f-arity-in-range-i (assert (< i ret-arity)
+                                             (str "Invalid arity: arity of f should be larger than " i))
+            the-composition (fn [& args]
+                                (assert (= (count args) ret-arity)
+                                        (str "Invalid number of args: " (count args) ", expect: " ret-arity))
+                                (apply f (remove-nth i args)))]
+        (restrict-arity the-composition ret-arity))))
+
+(defn multi-curry-argument
+  "次の関数を返す：
+   - 関数fを受け取り、fの引数のith以外をargsで埋めた１引数関数を返す。
+   - fの返り値は多値。vecに入れて表現する。"
+  [i & args]
+  (fn [f]
+      (let [f-arity (get-arity f)
+            check-f-arity-fits-args-cnt (assert (= f-arity (inc (count args)))
+                                                (str "Invalid arity: arity of f shuold be " (inc (count args))))
+            the-composition (fn [arg]
+                                (apply f (insert-nth i arg args)))]
+        (restrict-arity the-composition 1))))
+
+(defn multi-permute-arguments
+  "次の関数を返す：
+   - 関数fを受け取り、fに対してpermspecに応じて並び替えた引数を渡す関数を返す。
+   - fの返り値は多値。vecに入れて表現する。"
+  [& permspec]
+  (fn [f]
+      (let [f-arity (get-arity f)
+            check-f-arity-equals-to-permspec-len (assert (= f-arity (count permspec))
+                                                         (str "Invalid arity: arity of f should be " (count permspec)))
+            permute (make-permutation permspec)
+            the-composition (fn [& args]
+                                (assert (= f-arity (count args))
+                                        (str "Invalid number of args: " (count args) ", expect " f-arity))
+                                (apply f (permute args)))]
+        (restrict-arity the-composition f-arity))))
+
+(defn remove-nths
+  "lisのremove-idxs番目を除いたリストを返す"
+  [remove-idxs lis]
+  (filter some? (map-indexed (fn [idx el] (if (some #(= idx %) remove-idxs)
+                                nil
+                                el))
+               lis)))
+
+(defn discard-arguments
+  "discard-argumentの複数引数版"
+  [& idxs]
+  (fn [f]
+      (let [f-arity (get-arity f)
+            ret-arity (+ f-arity (count idxs))
+            check-f-arity-in-range-idxs (assert (< (apply max idxs) ret-arity)
+                                             (str "Invalid arity: arity of f should be larger than " (apply max idxs)))
+            the-composition (fn [& args]
+                                (assert (= (count args) ret-arity)
+                                        (str "Invalid number of args: " (count args) ", expect: " ret-arity))
+                                (apply f (remove-nths idxs args)))]
+        (restrict-arity the-composition ret-arity))))
+
+(defn insert-nths
+  "lsに値を追加して、idxs番目をelsにする"
+  [idxs els ls]
+  (assert (= (count idxs) (count els)))
+  (assert (< (apply max idxs) (+ (count els) (count ls))))
+  (let [zm (zipmap idxs els)]
+    (reduce-kv (fn [acc i el] (insert-nth i el acc))
+               ls
+               zm)))
+
+(defn curry-arguments
+  "curry-argumentの複数引数版"
+  [idxs & pre-args]
+  (fn [f]
+      (let [f-arity (get-arity f)
+            ret-arity (count idxs)
+            check-f-arity-fits-args-cnt (assert (= f-arity (+ (count idxs) (count pre-args)))
+                                                (str "Invalid arity: arity of f shuold be " (+ (count idxs) (count pre-args))))
+            the-composition (fn [& args]
+                                (apply f (insert-nths idxs args pre-args)))]
+        (restrict-arity the-composition ret-arity))))
+
+
