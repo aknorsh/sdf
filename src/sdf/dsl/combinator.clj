@@ -285,4 +285,32 @@
                                 (apply f (insert-nths idxs args pre-args)))]
         (restrict-arity the-composition ret-arity))))
 
+(defn fill-with-default
+  [dval lis]
+  (map (fn [el] (if (nil? el) dval el)) lis))
 
+(defn force-default-arguments
+  "関数にdefault値をもたせる関数。nilな値を勝手に書き換えるので実用上不便そう"
+  [default-val]
+  (fn [f]
+      (let [f-arity (get-arity f)
+            the-composition (fn [& args]
+                                (apply f (fill-with-default default-val args)))]
+        (restrict-arity the-composition f-arity))))
+
+(defn default-arguments
+  "force-default-argumentsは関数定義時点でdefault値を指定するので不便そう。呼び出し時点で受け取れるようにする。"
+  []
+  (fn [f]
+      (let [f-arity (get-arity f)
+            ret-arity (inc f-arity)
+            the-composition (fn [defval & args]
+                                (assert (= (count args) f-arity))
+                                (apply f (fill-with-default defval args)))]
+        (restrict-arity the-composition ret-arity))))
+
+(defn serial-compose
+  "複数の関数を直列に合成するcompose"
+  [& fs]
+  (reduce (fn [acc f] (compose acc f))
+          fs))

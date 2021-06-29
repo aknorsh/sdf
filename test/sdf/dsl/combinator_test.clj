@@ -220,3 +220,21 @@
                   (((curry-arguments [2] 'a 'b 'c) (fn [x y z w] (list 'foo x y z w)))
                'd)))))
 
+(deftest exercise-2-5-b-test
+  (testing "fill-with-default"
+           (is (= (fill-with-default 1 [2 nil 3 nil 4])
+                  '(2 1 3 1 4))))
+  (testing "force-default-arguments"
+           (is (= (((force-default-arguments 'x) (fn [x y z] (list x y z)))
+                   'a nil 'c)
+                  '(a x c))))
+  (testing "default-arguments"
+           (is (= (((default-arguments) (fn [x y z] (list x y z)))
+                   'x 'a nil 'c)
+                  '(a x c)))))
+
+(deftest exercise-2-5-c-test
+  (testing "serial-compose Valid"
+           (let [f (serial-compose (fn [x] (+ x 1)) (fn [x] (* x 2)) (fn [x] (+ x 3)))]
+             (is (= (f 5)
+                    17)))))
